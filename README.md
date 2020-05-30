@@ -7,3 +7,4 @@ Il progetto vuole andare a simulare un impianto antifurto: inserendo una passwor
 nel caso in cui rilevasse un movimento, aziona un allarme (buzzer passivo e led rosso). L'allarme può essere stoppato
 solo dal reinserimento della password. NB Nel caso in cui l'utente sbagliasse la password per tre volte consecutive si azionerebbe 
 l'allarme.
+fine       

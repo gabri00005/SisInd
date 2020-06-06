@@ -1,0 +1,245 @@
+RELAZIONE PROGETTO 
+
+
+SISTEMA ANTIFURTO CON SCHEDA STM NUCLEO-F401RE
+
+GABRIELE SILVA        FILIPPO BOTTI
+
+
+
+
+
+
+
+
+
+A.A. 2019-2020
+
+
+
+
+
+
+
+
+
+
+
+
+
+INDICE
+1 OBIETTIVO	3
+2 SCHEMA A BLOCCHI	3
+3 ELEMENTI USATI NEL PROGETTO	4
+4 PERIFERICHE	4
+4.1 Microcontrollore	5
+4.1.1 PIN USATI DEL MICROCONTROLLORE	6
+4.2 Sensore ad infrarossi HC-SR501	8
+4.2.1 funzionamento:	8
+4.2.2 specifiche tecniche:	9
+4.2.3 applicazioni:	9
+4.3 display LCD1602	10
+4.3.1  Introduzione ai componenti:	10
+4.3.2 Caratteristiche:	11
+4.3.3 Codice:	11
+4.4 tastiera 4x4	11
+4.4.1 Funzionamento	12
+4.4.2 Caratteristiche	12
+4.4.3 codice	12
+4.5 passive buzzer	12
+4.5.1 caratteristiche	13
+4.5.2 codice	13
+4.6 led	13
+4.6.1 Dimensionamento resistenze	14
+5 SCHEMA ELETTRICO PROGETTO	14
+6 LINK GITHUB	14
+7 LINK VIDEO YOUTUBE	14
+8 FOTO PROGETTO TERMINATO	14
+
+1 OBIETTIVO
+L’obiettivo del progetto è quello di simulare un impianto di allarme per un’abitazione. L’allarme in questione può essere inserito/disinserito attraverso l’immissione di una password (determinata in fase di programmazione).
+L’allarme è attivato grazie ad un sensore PIR HC-SR501, il quale avrà il compito di rilevare i movimenti (simulazione di un’intrusione), oppure da una successione di tre inserimenti errati della password. 
+L’allarme è composto da una sirena, generata da un buzzer passivo comandato da un timer in modalità PWM, e da un led rosso lampeggiante. Inoltre, andando a simulare l’impianto di allarme di un’abitazione, è stata presa la decisione di accendere tre led bianchi ogni qualvolta l’allarme venga attivato (che sia per un’intrusione o per uno scorretto inserimento della password), questi led vanno a simulare l’accensione delle luci dell’abitazione, come accade nei moderni allarmi antifurto.
+L’utente ha la possibilità di gestire l’allarme e di interfacciarsi con la scheda Nucleo grazie ad un Display LCD, il quale indicherà ogni azione compiuta dalla scheda, una tastiera, la quale permetterà all’utente di andare ad immettere la password e da un pulsante di invio, il quale permetterà all’utente di confermare l’inserimento della password e quindi la comunicherà alla scheda.
+Per favorire la trasparenza dell’impianto, e quindi dare la possibilità, senza visualizzare il display, di capire in quale configurazione è l’allarme al momento (allarme on, allarme off), sono presenti due led: uno giallo, il quale indica che l’allarme non è inserito (e quindi non vengono rilevati movimenti, ma può essere attivato solo per uno scorretto inserimento della password) e uno verde, il quale indica che l’allarme è inserito, ma non è stata rilevata alcuna intrusione.
+2 SCHEMA A BLOCCHI
+ 
+Figura 1: Schema a blocchi del sistema di allarme
+3 ELEMENTI USATI NEL PROGETTO 
+1 Scheda nucleo STM F401RE
+2 Breadboard
+1 Buzzer passivo
+1 Led rosso
+1 Led arancione
+1 Led verde
+3 Led bianchi
+1 Potenziometro 10k ohm 
+1 Sensore pir
+1 Display 16x2
+1 Tastiera 4x4
+
+4 PERIFERICHE
+Il nostro progetto fa uso di 6 periferiche: 
+1. Microcontrollore: NUCLEO-F401RE 
+2. Sensore infrarossi HC-SR501 
+3. Display LCD1602
+4. Tastiera 4x4
+5. Passive buzzer
+6. Led 5mm
+
+4.1 Microcontrollore 
+ 
+Il microcontrollore utilizzato nel nostro progetto é la NUCLEO-F401RE e sarà il dispositivo che ci permetterà di interfacciarci con il sensore ed il display.
+ I problemi che dobbiamo aﬀrontare sono i seguenti: 
+• Rilevare tramite interruzioni un movimento tramite sensore PIR
+• Far comunicare correttamente la tastiera 4x4 con la scheda nucleo
+• Visualizzare il risultato sul display di tutte le operazioni
+• Far suonare il buzzer passivo 
+• Far accendere i giusti led di segnalazione 
+4.1.1 PIN USATI DEL MICROCONTROLLORE
+ 
+(Senso orario)
+PC13
+PCO
+PC3
+PA4
+PA5
+PA6
+PC5
+PBO
+PB10
+PB12
+PC6
+PC7 
+PC8 
+PA9
+PA11
+ PA12 
+PA13
+ PA14
+PA15 
+PB6 
+PB8
+ PB9
+
+
+
+
+
+
+
+
+4.2 Sensore di movimento ad infrarossi HC-SR501
+ 
+
+Il sensore ad infrarossi che abbiamo scelto di utilizzare è il HC-SR501.
+Il sensore di movimento a infrarossi HC-SR501 è un sensore P.I.R. (Passive Infra Red) che permette di rilevare, il calore e il movimento. Funziona soltanto quando una persona si muove davanti a esso e una volta ferma smette di rilevarla. Trova applicazione in vari tipi di apparecchiature elettriche a rilevazione automatica, in particolare in prodotti di controllo automatici alimentati a batteria. Il segnale in uscita, la distanza di rilevamente e il tempo di ritardo possono essere selezionati tramite jumpers e trimmer.
+4.2.1 funzionamento:
+Il sensore è in grado di rilevare cambiamenti della luce ad infrarossi e se interpretati come movimento, portano l’output ad HIGH. Cosa viene interpretato come movimento o meno dipende largamente da delle impostazioni e gli aggiustamenti impostati sul sensore.
+INIZIALIZZAZIONE DEL DISPOSITIVO:
+Il dispositivo necessita circa 15 secondi per essere pronto all’uso. Il circuito e la logica del controllore necessita di questo breve periodo di tempo per iniziare a lavorare correttamente.
+ARE RILEVAZIONE DEL DISPOSITIVO:
+il dispositivo rileva il movimento all’interno di un angolo di 110 gradi in un range compreso tra i 3 e 7 metri.
+Questa sensibilità di rilevazione può essere modificata girando verso a destra (incremento range) o verso sinistra ( decremento range) la rotellina come in figura.
+ 
+Figura …: modifica range rilevazione
+Mentre l’altra rotellina serve per aggiustare la sensibilità dell’intervallo di tempo in cui il modulo del sensore PIR rimanga in posizione HIGH dopo aver rilevato il movimento. Il range varia tra i 3 secondi e i 15 minuti.
+Questa sensibilità di rilevazione può essere modificata girando verso a destra (incremento intervallo) o verso sinistra ( decremento intervallo) la rotellina come in figura.
+ 
+NOTA BENE: Dopo che sarà terminato l’intervallo di tempo che abbiamo impostato per il rilevamento di movimento,l’output del sensore andrà a LOW (OFF) per circa 3 secondi. Tutti i movimenti quindi non saranno rilevati durante questo periodo di 3 secondi.
+4.2.2 specifiche tecniche:
+Tensione di funzionamento: 4.5 - 20Vcc
+Corrente di riposo: <50uA
+Range di rilevamento: 0-7m
+Livello di uscita: alto 3,3V / basso 0V 
+Tempo di attesa: 5-200s (regolabile)
+Angolo di rilevamento: <110°
+Misura della lente del sensore: diametro 23 mm 
+Temperatura di funzionamento: -15/ +70° C
+
+4.3 display LCD1602
+ 
+
+Questo display ha una retroilluminazione LED e può visualizzare due righe da 16 caratteri ognuna. Sul display puoi vedere un rettangolino per ogni carattere del display ed i pixel che formano ogni carattere. Il display è solo bianco e blu ed è pensato per visualizzare solo del testo(caratteri,numeri e caratteri speciali).
+Tramite il potenziometro da 10k ohm è possibile variare la retroilluminazione del display faendola variare più o meno di intensità.
+4.3.1  Introduzione ai componenti:
+Specifiche dei pin del modulo LCD1602:
+ VSS: Il pin da connettere alla messa a terra 
+VDD: Il pin che verrà connesso alla sorgente di voltaggio +5 V 
+VO: Il pin atto ad aggiustare il contrasto del display LCD1602 
+RS: Il pin di selezione del registro, che ti permette di controllare su quale area della memoria del display LCD si andrà a scrivere il nuovo carattere. Puoi selezionare il pin del registro dei dati, che mantiene ciò che andremo a scrivere sullo schermo, oppure il registro delle istruzioni, il quale riceve le istruzioni su cosa fare di seguito. R/W: Questo pin serve a selezionale la modalità di lettura o scrittura. 
+E: il pin di abilitazione, quando alimentato con bassi livelli di energia, determina l’esecuzione di istruzioni rilevanti sul modulo LCD. 
+D0-D7：Pin che leggono e scrivono i dati. 
+A e K: Pin che controllano la retroilluminazione.
+il funzionamento può essere a 4bit o 8bit, a seconda dei piedini usati. La differenza è che a 8bit la velocità di aggiornamento sarà superiore, ma con lo “svantaggio” di consumare 8 porte della scheda Arduino invece che 4 per il bus dati. A seconda quindi dell’applicazione, preferiremo una modalità piuttosto che un’altra.
+Nella nostra applicazione useremo 4 bit da d4 a d7
+4.3.2 Caratteristiche:
+2-line x16 characters display; 5x8 dots with cursor 
+  Built-in controller (KS0066U or Equivalent)
+ +5V power supply(Also available for +3.3V)
+1/16 duty cycle;1/5bias; 
+ TN, HTN, STN or FSTN mode 
+ BKL to be driven by pin1,pin2,or pin15,pin16,or A,K
+ 
+4.3.3 Codice:
+
+
+4.4 tastiera 4x4
+ 
+4.4.1 Funzionamento
+Ogni tasto è inserito quindi in una matrice circuitale di righe e colonne. Quando viene premuto, due segnali (uno identifica la riga e l'altro la colonna) arrivano alla scheda stm che tramite una mappa dei caratteri e la generazione di una interruzione è in grado di decodificarli nel simbolo corrispondente.
+Il funzionamento di un Keypad a membrana è davvero semplice. Un tastierino 4×4 è composto da una matrice di pulsanti disposti in 4 righe e 4 colonne. Quando premiamo un pulsante della tastiera viene collegata elettricamente una riga con una colonna. Per capire quale pulsante premiamo, bisogna alimentare in sequenza le 4 colonne e contemporaneamente controllare il livello di tensione in ogni singola riga. Ogni colonna è continuamente impostata ad un livello logico alto (5V) mentre ogni riga è continuamente impostata ad un livello logigo basso (0V).
+4.4.2 Caratteristiche 
+4.4.3 codice
+
+
+4.5 passive buzzer
+ 
+Figura 
+
+Il principio di funzionamento del passive buzzer(figura) si fonda sull’utilizzo della modulazione PWM le cui onde permettono la vibrazione dell’aria e la generazione del suono. Impostando la frequenza delle onde correttamente, si possono generare suoni differenti. Nel nostro caso il segnale genera un impulso da 5000 hz il quale genera un ottava di do.
+
+4.5.1 caratteristiche
+ 
+In figura vengono rappresentate le misure del cicalino passivo specificate nel suo datasheet.
+Caratteristiche principali:
+5V  Passive buzzer  alternating current（SOT laminate tube ） 
+ 
+
+
+Specification of tact switch series： 
+ 
+voltage：3—12V 
+resistance：16R
+
+ 4.5.2 codice
+                            
+
+ 
+
+4.6 led 
+I LED sono ottimi indicatori luminosi, essi utilizzano una quantità molto esigua di elettricità ed hanno una vita quasi infinita.Il led preso in considerazione in fase di progetto è da 5mm. 5mm si riferisce al diametro del LED. Altre dimensioni comuni sono la 33mm e la 10mm. Non si può collegare direttamente il LED alla batteria o all’erogatore di voltaggio, in quanto: 
+1) Il LED ha un lato positivo ed uno negativo, e non si accenderà se piazzato nel senso sbagliato. 
+2) Il LED va utilizzato con una resistenza per limitare la quantità di corrente che fluisce attraverso di esso, altrimenti si brucia
+Se non si utilizza una resistenza con il led potrebbe distruggersi immediatamente avendo troppa corrente che fluisce in esso, la corrente surriscalderà e distruggerà la giunzione interna che produce la luce. Ci sono due modi per sapere qual è il lato positivo e quello negativo nel led. In primo luogo il piedino più lungo è quello positivo. In alternativa, dove il piedino negativo entra nel corpo del led c’è un piano metallico di dimensioni maggiori rispetto al positivo.(figura 3.6.1)
+ 
+Figura 3.6.1
+4.6.1 Dimensionamento resistenze
+5 SCHEMA ELETTRICO PROGETTO
+Provare a fare con breadbord e componenti in due immagini separate
+
+ 6 LINK GITHUB
+https://github.com/FilippoBotti/SisInd.git
+7 LINK VIDEO YOUTUBE
+(prossimamente)
+ 8 FOTO PROGETTO TERMINATO
+(prossimamente)
+
+
+
+
+Se vuoi modificare qualcosa metti le modifiche evidenziate in giallo,poi ci penso io con word a far todoss
+
+
+
+
